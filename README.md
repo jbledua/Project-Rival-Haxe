@@ -17,7 +17,9 @@ Further instuction can be found of the [Website](https://haxeflixel.com/document
 # Ortio
 The first game that will be added is at game Otrio
 
-### Basic Game Rules
+![Otrio Example](documentation/Otrio-Examle.png)
+
+### Game Rules
 Otrio is a board game that can be played with 2 to 4 players. The objective of the game is to be the first player to line up three pieces of the same color, either in a straight line or in a circular pattern.
 
 To set up the game, each player chooses a color and takes three different-sized circular pieces in their color. The board consists of three concentric circles, each divided into eight spaces. The largest circle is on the outside, followed by the medium and small circles.
