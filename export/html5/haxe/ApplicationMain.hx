@@ -20,7 +20,7 @@ class ApplicationMain
 
 		#if (js && html5)
 		#if (munit || utest)
-		lime.system.System.embed("Project-Rival-Haxe", null, 640, 480);
+		lime.system.System.embed("Project-Rival-Haxe", null, 1280, 720);
 		#end
 		#else
 		create(null);
@@ -35,7 +35,7 @@ class ApplicationMain
 		ManifestResources.init(config);
 		#end
 
-		app.meta["build"] = "2";
+		app.meta["build"] = "3";
 		app.meta["company"] = "HaxeFlixel";
 		app.meta["file"] = "Project-Rival-Haxe";
 		app.meta["name"] = "Project-Rival-Haxe";
@@ -54,14 +54,14 @@ class ApplicationMain
 			element: null,
 			frameRate: 60,
 			#if !web fullscreen: false, #end
-			height: 480,
+			height: 720,
 			hidden: #if munit true #else false #end,
 			maximized: false,
 			minimized: false,
 			parameters: {},
 			resizable: false,
 			title: "Project-Rival-Haxe",
-			width: 640,
+			width: 1280,
 			x: null,
 			y: null,
 		};
