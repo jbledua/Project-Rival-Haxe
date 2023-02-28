@@ -14,7 +14,7 @@ import haxe.Log;
 class OtrioBoard extends FlxSprite
 {
 	// Global Variables
-	private var board:OtrioBoard;
+	// private var board:OtrioBoard;
 	private var players:FlxTypedGroup<OtrioPlayer>;
 	private var slots:FlxTypedGroup<OtrioSlot>;
 	private var pieces:FlxTypedGroup<OtrioPiece>;
@@ -22,13 +22,42 @@ class OtrioBoard extends FlxSprite
 	// Local Variables
 	private var boardSlots:FlxTypedGroup<OtrioSlot>;
 
-	// Animation Variables
+	// Spawing Variables
 	private var start:FlxPoint;
 	private var end:FlxPoint;
 
+	// Signals
 	private var spawnComplete:FlxSignal;
 
-	// Constructor
+	//--------------------------------------------------------------------------
+	//  Getters and Setters
+	//--------------------------------------------------------------------------
+	// Used to pass global Peices from playstate
+	public function setPieces(_pieces:FlxTypedGroup<OtrioPiece>)
+		this.pieces = _pieces;
+
+	// Used to pass global Slots from playstate
+	public function setSlots(_slots:FlxTypedGroup<OtrioSlot>)
+		this.slots = _slots;
+
+	// Set and get start point
+	public function setStart(_start:FlxPoint):Void
+		start = new FlxPoint(_start.x - Std.int(this.width / 2), _start.y - Std.int(this.height / 2));
+
+	public function getStart():FlxPoint
+		return start;
+
+	// Set and get the end point
+	public function setEnd(_end:FlxPoint):Void
+		end = new FlxPoint(_end.x - Std.int(width / 2), _end.y - Std.int(height / 2));
+
+	public function getEnd():FlxPoint
+		return end;
+
+	//--------------------------------------------------------------------------
+	//  Constructor and create functions
+	//--------------------------------------------------------------------------
+
 	public function new(?_start:FlxPoint = null, ?_spawnComplete:FlxSignal = null)
 	{
 		// Create temp variables for the width and height
@@ -56,6 +85,60 @@ class OtrioBoard extends FlxSprite
 		kill();
 	} // End of constructor
 
+	public function createSlots()
+	{
+		// This function could be impoved using for loops but it works for now
+
+		this.boardSlots = new FlxTypedGroup<OtrioSlot>(9); // Instantiate Slots
+
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+		this.boardSlots.add(new OtrioSlot());
+
+		// Set Pieces
+		// Top Row
+		this.boardSlots.members[0].setPieces(this.pieces);
+		this.boardSlots.members[1].setPieces(this.pieces);
+		this.boardSlots.members[2].setPieces(this.pieces);
+
+		// Middle Row
+		this.boardSlots.members[3].setPieces(this.pieces);
+		this.boardSlots.members[4].setPieces(this.pieces);
+		this.boardSlots.members[5].setPieces(this.pieces);
+
+		// Bottom Row
+		this.boardSlots.members[6].setPieces(this.pieces);
+		this.boardSlots.members[7].setPieces(this.pieces);
+		this.boardSlots.members[8].setPieces(this.pieces);
+
+		Log.trace("Creating Board...");
+
+		// // Create Slots
+		// // Top Row
+		// this.boardSlots.members[0].create();
+		// this.boardSlots.members[1].create();
+		// this.boardSlots.members[2].create();
+
+		// // Middle Row
+		// this.boardSlots.members[3].create();
+		// this.boardSlots.members[4].create();
+		// this.boardSlots.members[5].create();
+
+		// // Bottom Row
+		// this.boardSlots.members[6].create();
+		// this.boardSlots.members[7].create();
+		// this.boardSlots.members[8].create();
+	} // End createSlots
+
+	//--------------------------------------------------------------
+	// Spawning Functions
+	//--------------------------------------------------------------
 	// Spawn the board
 	public function spawn(?_duration:Float = 0.5):Void
 	{
@@ -74,85 +157,18 @@ class OtrioBoard extends FlxSprite
 			"scale.x": 1,
 			"scale.y": 1
 		}, _duration, {onComplete: onSpawnComplete});
-	} // End of spawn function
+	} // End spawn function
 
-	// Set and get start point
-	public function setStart(_start:FlxPoint):Void
-		start = new FlxPoint(_start.x - Std.int(this.width / 2), _start.y - Std.int(this.height / 2));
-
-	// start = new FlxPoint(_start.x - Std.int(width / 2), _start.y - Std.int(height / 2));
-
-	public function getStart():FlxPoint
-		return start;
-
-	// Set and get the end point
-	public function setEnd(_end:FlxPoint):Void
-		end = new FlxPoint(_end.x - Std.int(width / 2), _end.y - Std.int(height / 2));
-
-	// end = new FlxPoint(_end.x - this.width / 2, _end.y - this.height / 2);
-
-	public function getEnd():FlxPoint
-		return end;
-
-	public function onSpawnComplete(_tween:FlxTween):Void
+	// Spawn Slots
+	public function spawnSlots():Void
 	{
-		// Log that the board has spawned
-		Log.trace("Board Spawned");
+		// Log that the board is spawning
+		Log.trace("Spawning board slots...");
 
-		// // If there is a callback, call it
-		if (spawnComplete != null)
+		for (_slot in this.boardSlots.members)
 		{
-			spawnComplete.dispatch();
+			_slot.spawn();
 		}
-	} // End of onSpawnComplete function
-
-	public function createSlots()
-	{
-		// This function could be impoved using for loops but it works for now
-
-		this.boardSlots = new FlxTypedGroup<OtrioSlot>(9); // Instantiate Slots
-
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-		this.boardSlots.add(new OtrioSlot());
-
-		// // Set Pieces
-		// // Top Row
-		// this.boardSlots.members[0].setPieces(this.pieces);
-		// this.boardSlots.members[1].setPieces(this.pieces);
-		// this.boardSlots.members[2].setPieces(this.pieces);
-
-		// // Middle Row
-		// this.boardSlots.members[3].setPieces(this.pieces);
-		// this.boardSlots.members[4].setPieces(this.pieces);
-		// this.boardSlots.members[5].setPieces(this.pieces);
-
-		// // Bottom Row
-		// this.boardSlots.members[6].setPieces(this.pieces);
-		// this.boardSlots.members[7].setPieces(this.pieces);
-		// this.boardSlots.members[8].setPieces(this.pieces);
-
-		// // Create Slots
-		// // Top Row
-		// this.boardSlots.members[0].create();
-		// this.boardSlots.members[1].create();
-		// this.boardSlots.members[2].create();
-
-		// // Middle Row
-		// this.boardSlots.members[3].create();
-		// this.boardSlots.members[4].create();
-		// this.boardSlots.members[5].create();
-
-		// // Bottom Row
-		// this.boardSlots.members[6].create();
-		// this.boardSlots.members[7].create();
-		// this.boardSlots.members[8].create();
 
 		// Move Slots into Place
 		// Top Row
@@ -199,15 +215,21 @@ class OtrioBoard extends FlxSprite
 		{
 			Log.trace("Slots is null");
 		}
-	} // End createSlots
+	} // End spawn function
 
-	public function setPieces(_pieces:FlxTypedGroup<OtrioPiece>)
+	//--------------------------------------------------------------
+	// Event handlers
+	//--------------------------------------------------------------
+	// Called when the board has spawned
+	public function onSpawnComplete(_tween:FlxTween):Void
 	{
-		this.pieces = _pieces;
-	}
+		// Log that the board has spawned
+		// Log.trace("Board Spawned");
 
-	public function setSlots(_slots:FlxTypedGroup<OtrioSlot>)
-	{
-		this.slots = _slots;
-	}
+		// // If there is a callback, call it
+		if (spawnComplete != null)
+		{
+			spawnComplete.dispatch();
+		}
+	} // End of onSpawnComplete function
 } // End of OtrioBoard class

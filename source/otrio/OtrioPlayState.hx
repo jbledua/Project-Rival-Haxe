@@ -9,10 +9,13 @@ import flixel.util.FlxColor;
 import flixel.util.FlxSignal;
 import flixel.util.FlxTimer;
 import haxe.Log;
+import haxe.exceptions.ArgumentException;
+import haxe.rtti.CType.Typedef;
 import js.html.EventListener;
 
 class OtrioPlayState extends FlxState
 {
+	// Global Variables
 	private var board:OtrioBoard;
 	private var players:FlxTypedGroup<OtrioPlayer>;
 	private var slots:FlxTypedGroup<OtrioSlot>;
@@ -25,6 +28,9 @@ class OtrioPlayState extends FlxState
 
 	// private var boardSpawned:FlxSignal;
 	// private var allPlayersSpawned:FlxSignal;
+	//--------------------------------------------------------------
+	// Create Functions
+	//--------------------------------------------------------------
 
 	override public function create():Void
 	{
@@ -32,7 +38,7 @@ class OtrioPlayState extends FlxState
 		createGame();
 
 		// Start game
-		newGame();
+		startGame();
 	} // End of create function
 
 	// Create Game objects
@@ -72,7 +78,7 @@ class OtrioPlayState extends FlxState
 		board.createSlots();
 	} // End of createBoard function.
 
-	public function createPlayers(_playerCount:Int = 2):Void
+	public function createPlayers(_playerCount:Int = 4):Void
 	{
 		players = new FlxTypedGroup<OtrioPlayer>(_playerCount);
 
@@ -97,30 +103,78 @@ class OtrioPlayState extends FlxState
 			OtrioPlayer.HORIZONTAL
 		];
 
+		var _colors:Array<Array<FlxColor>> = [
+			[
+				FlxColor.fromHSB(0, 1, 1, 1),
+				FlxColor.fromHSB(0, 1, 0.75, 1),
+				FlxColor.fromHSB(0, 1, 0.75, 1),
+				FlxColor.fromHSB(0, 1, 0.25, 1)
+			],
+			[
+				FlxColor.fromHSB(240, 1, 1, 1),
+				FlxColor.fromHSB(240, 1, 0.75, 1),
+				FlxColor.fromHSB(240, 1, 0.75, 1),
+				FlxColor.fromHSB(240, 1, 0.25, 1)
+			],
+			[
+				FlxColor.fromHSB(120, 1, 1, 1),
+				FlxColor.fromHSB(120, 1, 0.75, 1),
+				FlxColor.fromHSB(120, 1, 0.75, 1),
+				FlxColor.fromHSB(120, 1, 0.25, 1)
+			],
+			[
+				FlxColor.fromHSB(300, 1, 1, 1),
+				FlxColor.fromHSB(300, 1, 0.75, 1),
+				FlxColor.fromHSB(300, 1, 0.75, 1),
+				FlxColor.fromHSB(300, 1, 0.25, 1)
+			]
+		];
+
 		for (i in 0..._playerCount)
 		{
+			// Create Player
 			var _player:OtrioPlayer = new OtrioPlayer(i, _types[i], _startPositions[i]);
 
+			// Set Player Slots and Pieces
+			_player.setSlots(this.slots);
+			_player.setPieces(this.pieces);
+
+			// Set Player Colors
+			_player.setColors(_colors[i][0], _colors[i][1], _colors[i][2], _colors[i][3]);
+
+			// Set Player End Position
 			_player.setEnd(_endPositions[i]);
+
+			// Create Player Slots
+			_player.createSlots();
 
 			if (i < _playerCount - 1)
 				_player.setSpawnComplete(spawnNextPlayer);
 			else
-				_player.setSpawnComplete(gameReady);
+				_player.setSpawnComplete(spawnSlots);
 
+			// Add Player to Global Group
 			this.players.add(_player);
 		}
 	} // End of createPlayer function.
 
+	//--------------------------------------------------------------
+	// Game Functions
+	//--------------------------------------------------------------
 	// Start Game
-	public function newGame():Void
+	public function startGame():Void
 	{
 		add(players);
 		add(board);
+		add(slots);
 
 		// Spawn the board
 		board.spawn();
 	} // End of startGame function.
+
+	//--------------------------------------------------------------
+	// Event Handlers
+	//--------------------------------------------------------------
 
 	private function onSpawnNextPlayer():Void
 	{
@@ -137,7 +191,18 @@ class OtrioPlayState extends FlxState
 	public function onSpawnSlots():Void
 	{
 		// Spawn the next slot
-		Log.trace("Spawn slot");
+		// Log.trace("Spawn slot");
+
+		// Spawn board slots
+		board.spawnSlots();
+
+		// Spawn Player Slots
+		for (i in 0...players.length)
+		{
+			players.members[i].spawnSlots();
+		}
+
+		gameReady.dispatch();
 	} // End of spawnNextSlot function.
 
 	// On game ready
